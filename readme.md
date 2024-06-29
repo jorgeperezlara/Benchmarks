@@ -95,6 +95,6 @@ All in all, I can safely say after several runs, that indeed the Zig version is 
 | **Zig (safe)** | 98.073         | 0.000                                  | 1.000                                   |
 | Zig (fast)           | 116.093        | 18.020                                 | 1.184                                   |
 
-I can also conclude that, **for this benchmark**, if any Rust supporter believes a 4% decrease in performance for Rust is not significant, I believe it's coherent to say that a 31.3% performance decrease is definitely **not insignificant**, and that rust is by far the faster among all.
+In my opinion, **for this benchmark**, if anyone believes a 4% decrease in performance for Rust is not significant, I believe it's coherent to say that a 31.3% performance decrease is definitely **not insignificant**, and that Zig is by far the faster among all.
 
 While the performance differnce between C++ and fast Zig; and C++ and Rust is not too big (in this machine), the difference between fast Zig and Rust is around 6.6%, and this might grow larger in embedded or lower-power systems.
