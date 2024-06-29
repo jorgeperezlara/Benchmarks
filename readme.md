@@ -74,6 +74,15 @@ user    1m56.090s
 sys     0m0.003s
 ```
 
+```
+$ clang -stdlib=libgcc -O3 c.c
+$ time ./c
+The result is 9999999999
+real    1m58.715s
+user    1m58.543s
+sys     0m0.002s
+```
+
 I'm very surprised at the excellent performance of safe Zig, which, suppossedly, should be slower than fast Zig (and C++, and Rust).
 
 All in all, I can safely say after several runs, that indeed the Zig version is consistently the most performant (and significantly so for the safe Zig one); and the Rust one slightly **(but consistenly)** less than the C++ one. You may find a summary table below:
@@ -81,6 +90,7 @@ All in all, I can safely say after several runs, that indeed the Zig version is 
 |                      | Total time (s) | Deviation from the most performant (s) | Deviation from the most performant (×) |
 | :------------------- | :------------- | :------------------------------------- | :-------------------------------------- |
 | **C++**        | 119.102        | 21.029                                 | 1.214                                   |
+| **C**               | 118.545        | 20.472                                 | 1.209                                   |
 | **Rust**       | 123.766        | 25.693                                 | 1.262                                   |
 | **Zig (safe)** | 98.073         | 0.000                                  | 1.000                                   |
 | Zig (fast)           | 116.093        | 18.020                                 | 1.184                                   |
