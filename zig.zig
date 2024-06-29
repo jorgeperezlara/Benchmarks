@@ -1,11 +1,10 @@
 const print = @import("std").debug.print;
 
 pub fn half(num: i64) i64 {
-    var mut_num = num;
-    if (mut_num > 1) {
-        mut_num = half(@divFloor(mut_num, 2));
+    if (num > 1) {
+        return half(@divFloor(num, 2));
     }
-    return mut_num;
+    return num;
 }
 
 pub fn main() void {
