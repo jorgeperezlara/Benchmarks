@@ -10,8 +10,7 @@ pub fn half(num: i64) i64 {
 pub fn main() void {
     var j: i64 = 0;
     for (0..10000000000) |i| {
-        const result: i64 = @intCast(i);
-        j = j + half(result);
+        j += half(@intCast(i));
     }
     print("The result is {}\n", .{j});
 }
