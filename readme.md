@@ -90,11 +90,94 @@ All in all, I can safely say after several runs, that indeed the Zig version is 
 |                      | Total time (s) | Deviation from the most performant (s) | Deviation from the most performant (×) |
 | :------------------- | :------------- | :------------------------------------- | :-------------------------------------- |
 | **C++**        | 119.102        | 21.029                                 | 1.214                                   |
-| **C**               | 118.545        | 20.472                                 | 1.209                                   |
+| **C**          | 118.545        | 20.472                                 | 1.209                                   |
 | **Rust**       | 123.766        | 25.693                                 | 1.262                                   |
 | **Zig (safe)** | 98.073         | 0.000                                  | 1.000                                   |
 | Zig (fast)           | 116.093        | 18.020                                 | 1.184                                   |
 
-In my opinion, **for this benchmark**, if anyone believes a 4% decrease in performance for Rust is not significant, I believe it's coherent to say that a 31.3% performance decrease is definitely **not insignificant**, and that Zig is by far the faster among all.
+~~In my opinion, **for this benchmark**, if anyone believes a 4% decrease in performance for Rust is not significant, I believe it's coherent to say that a 31.3% performance decrease is definitely **not insignificant**, and that Zig is by far the faster among all.~~
 
-While the performance differnce between C++ and fast Zig; and C++ and Rust is not too big (in this machine), the difference between fast Zig and Rust is around 6.6%, and this might grow larger in embedded or lower-power systems.
+~~While the performance differnce between C++ and fast Zig; and C++ and Rust is not too big (in this machine), the difference between fast Zig and Rust is around 6.6%, and this might grow larger in embedded or lower-power systems.~~
+
+## Conclusions
+
+After reading lots of replies, I believe I have reached a very interesting conclusion that the readers might want to read, thanks to [/u/TDplay/](https://www.reddit.com/r/programming/comments/1dqyarh/comment/laux15o/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button):
+
+This is a rather surprising result, so let's take a closer look instead of jumping to conclusions. In particular, let's look at the assembly of the `half` function.
+
+For the sake of brevity, I am stripping the assembly of any comments, unnecessary labels, and debug information. I am also looking
+exclusively at the `half` function. If you want to view the generated assembly in full, run the commands which I provide, and open
+the assembly files in your favourite text editor.
+
+I am testing this for the x86_64-unknown-linux-gnu target.
+
+C code, compiled `clang -O3 -S c.c -o c.s`
+
+```
+half:
+	.p2align	4, 0x90
+.LBB0_1:
+	movq	%rdi, %rax
+	shrq	%rdi
+	cmpq	$1, %rax
+	jg	.LBB0_1
+	retq
+```
+
+ C++ code, compiled `clang++ -O3 -S c++.cpp -o c++.s`
+
+```
+_Z4halfx:
+	.p2align	4, 0x90
+.LBB0_1:
+	movq	%rdi, %rax
+	shrq	%rdi
+	cmpq	$1, %rax
+	jg	.LBB0_1
+	retq
+```
+
+Rust code, compiled `rustc -O --emit=asm rust.rs`. I have marked the `half` function as `#[inline(never)]` - without this annotation, the Rust compiler will inline the `half` function and not emit any machine code for it.
+
+```
+_ZN4rust4half17h3685362d235d10a4E:
+	.p2align	4, 0x90
+.LBB4_1:
+	movq	%rdi, %rax
+	shrq	%rdi
+	cmpq	$1, %rax
+	jg	.LBB4_1
+	retq
+```
+
+Zig code, compiled `zig build-exe zig.zig -target x86_64-linux -O ReleaseFast -femit-asm=zig.s`. Note that I have modified the call to `half` from `main` to `@call(.never_inline, half, .{result})`  - this is for the same reason as the `#[inline(never)]` annotation in the Rust test.
+
+Note that the Zig compiler has emitted Intel syntax, while all the other compilers emit AT&T syntax.
+
+```
+zig.half:
+	.p2align	4, 0x90
+.LBB10_1:
+	mov	rax, rdi
+	shr	rdi
+	cmp	rax, 1
+	jg	.LBB10_1
+	ret
+```
+
+Zig code, compiled `zig build-exe zig.zig -target x86_64-linux -O ReleaseSafe -femit-asm=zig.s`. I have performed the same modification as above.
+
+```
+zig.half:
+	.p2align	4, 0x90
+.LBB14_1:
+	mov	rax, rdi
+	shr	rdi
+	cmp	rax, 1
+	jg	.LBB14_1
+	ret
+```
+
+As I suspected, the generated machine code is identical.
+
+All of these benchmarks are emitting identical machine code, and therefore the performance is identical. As such, the performance difference you have measured is either statistical deviation or a methodological error.
