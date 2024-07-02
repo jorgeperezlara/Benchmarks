@@ -37,7 +37,7 @@ cccccccc;.:odl:.;cccccccccccccc:,.       CPU: 11th Gen Intel i5-11400H (12) @ 4.
 Now, these are the results:
 
 ```
-$ clang++ -stdlib=libstdc++ -O3 c++.cpp
+$ clang++ -stdlib=libstdc++ -O3 c++.cpp -o c++
 $ time ./c++ 
 The result is 9999999999
 real    1m59.314s
@@ -55,8 +55,8 @@ sys     0m0.002s
 ```
 
 ```
-$ zig build-exe zig.zig -target x86_64-linux -O ReleaseSafe
-$ time ./zig
+$ zig build-exe zig.zig -target x86_64-linux -O ReleaseSafe --name zig-safe
+$ time ./zig-safe
 The result is 9999999999
 
 real    1m38.193s
@@ -65,8 +65,8 @@ sys     0m0.003s
 ```
 
 ```
-$ zig build-exe zig.zig -target x86_64-linux -O ReleaseFast
-$ time ./zig
+$ zig build-exe zig.zig -target x86_64-linux -O ReleaseFast --name zig-fast
+$ time ./zig-fast
 The result is 9999999999
 
 real    1m56.232s
@@ -75,7 +75,7 @@ sys     0m0.003s
 ```
 
 ```
-$ clang -stdlib=libgcc -O3 c.c
+$ clang -stdlib=libgcc -O3 c.c -o c
 $ time ./c
 The result is 9999999999
 real    1m58.715s
