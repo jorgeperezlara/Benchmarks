@@ -1,5 +1,12 @@
+TARGETS = c++ rust zig-safe zig-fast c
+RUNS ?= 3
+
 .PHONY: all
-all: c++ rust zig-safe zig-fast c
+all: $(TARGETS)
+
+.PHONY: benchmark
+benchmark: all
+	hyperfine -r$(RUNS) $(foreach TARGET,$(TARGETS),./$(TARGET))
 
 c: c.c
 	clang -stdlib=libgcc -O3 $< -o $@
